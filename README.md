@@ -99,6 +99,7 @@ Open <http://localhost:3000>.
    - `OPENAI_API_KEY`
    - `SUPABASE_URL` — must be the **Project URL** from Supabase → Settings → API (`https://YOUR-REF.supabase.co`). **Do not** paste the `supabase.com/dashboard/...` link from your browser; that breaks the profile picker with a wall of HTML.
    - `SUPABASE_ANON_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`)
+   - `SITE_PASSWORD` — optional family password; when set, the whole site (including `/api/*`) requires login at `/login` first. Add `SITE_AUTH_SECRET` (a long random string) in production so the cookie is not signed with the password itself.
    
    For the bundled `fallacy-forum` project, the Project URL is:
    `https://xmxmgyvjhbekrcezfpup.supabase.co`
@@ -192,9 +193,13 @@ The History page reads from sessions + the stats view to surface weak areas.
 
 ---
 
+## Site password (optional)
+
+Set `SITE_PASSWORD` in `.env.local` or Vercel to require a shared family password before using the app. Middleware checks an **httpOnly cookie** (not the password in the browser). Use **Sign out** in the header to clear it. Leave `SITE_PASSWORD` unset during local dev if you want open access.
+
 ## Notes & limits
 
-- **No auth.** Anyone with the URL can pick / create profiles. Fine for family use; if you want to lock it down later, add Supabase Auth + RLS policies.
+- **Debater profiles** are not login accounts — they remain per-browser picks under the site gate. For per-user accounts and private data, add Supabase Auth + RLS later.
 - **Profiles are stored on the server**, so they sync across devices. Profile selection (which profile you're using right now) is stored in the browser.
 - **Costs:** ~$0.0002 per generated question with `gpt-4o-mini`. A 10-question test ≈ 0.2¢.
 - **iPhone/iPad ready** — fully responsive. Add to Home Screen for an app-like experience.

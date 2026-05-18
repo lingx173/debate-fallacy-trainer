@@ -4,6 +4,7 @@ import './globals.css';
 import { ProfileProvider } from '@/components/ProfileContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Nav } from '@/components/Nav';
+import { isSiteGateEnabled } from '@/lib/site-auth';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -34,13 +35,15 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const siteGateEnabled = isSiteGateEnabled();
+
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
       <body>
         <ProfileProvider>
           <header className="border-b border-border bg-surface/80 backdrop-blur sticky top-0 z-40">
             <div className="container-wide flex items-center justify-between py-4">
-              <Nav />
+              <Nav siteGateEnabled={siteGateEnabled} />
               <ThemeToggle />
             </div>
           </header>

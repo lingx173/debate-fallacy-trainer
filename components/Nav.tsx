@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useProfile } from './ProfileContext';
 import { User } from 'lucide-react';
+import { SiteSignOut } from './SiteSignOut';
 
 const links = [
   { href: '/', label: 'Home' },
@@ -13,12 +14,12 @@ const links = [
   { href: '/history', label: 'History' },
 ];
 
-export function Nav() {
+export function Nav({ siteGateEnabled = false }: { siteGateEnabled?: boolean }) {
   const pathname = usePathname();
   const { profile } = useProfile();
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-6 flex-1 min-w-0">
       <Link href="/" className="flex items-center gap-2 group">
         <Logo />
         <span className="font-display text-lg font-semibold tracking-tight">Fallacy Forum</span>
@@ -41,15 +42,18 @@ export function Nav() {
           );
         })}
       </nav>
-      {profile && (
-        <Link
-          href="/profile"
-          className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-offset hover:bg-primary-highlight text-sm font-medium"
-        >
-          <User size={14} />
-          <span className="hidden sm:inline">{profile.name}</span>
-        </Link>
-      )}
+      <div className="ml-auto flex items-center gap-1">
+        {profile && (
+          <Link
+            href="/profile"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-offset hover:bg-primary-highlight text-sm font-medium"
+          >
+            <User size={14} />
+            <span className="hidden sm:inline">{profile.name}</span>
+          </Link>
+        )}
+        {siteGateEnabled && <SiteSignOut />}
+      </div>
     </div>
   );
 }
