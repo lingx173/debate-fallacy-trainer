@@ -17,9 +17,20 @@ type Props = {
   onNext: () => void;
   nextLabel?: string;
   showCounter?: { current: number; total: number };
+  /** Hide the fallacy name badge after submit (e.g. random Practice mode). */
+  showFallacyBadge?: boolean;
+  prompt?: string;
 };
 
-export function QuestionCard({ q, onAnswered, onNext, nextLabel = 'Next', showCounter }: Props) {
+export function QuestionCard({
+  q,
+  onAnswered,
+  onNext,
+  nextLabel = 'Next',
+  showCounter,
+  showFallacyBadge = true,
+  prompt = 'Crossfire snippet — what fallacy is going on here?',
+}: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -50,7 +61,7 @@ export function QuestionCard({ q, onAnswered, onNext, nextLabel = 'Next', showCo
       <div className="card">
         <div className="flex items-center gap-2 mb-3 text-text-muted text-sm">
           <MessagesSquare size={16} />
-          <span>Crossfire snippet — what fallacy is going on here?</span>
+          <span>{prompt}</span>
         </div>
         <div className="whitespace-pre-wrap text-text leading-relaxed font-[450]">
           {q.argument_text}
@@ -121,7 +132,7 @@ export function QuestionCard({ q, onAnswered, onNext, nextLabel = 'Next', showCo
                 <h3 className="font-display text-lg text-error">Not quite</h3>
               </>
             )}
-            <span className="badge ml-auto">{q.fallacy_name}</span>
+            {showFallacyBadge && <span className="badge ml-auto">{q.fallacy_name}</span>}
           </div>
           <p className="leading-relaxed mb-4">{q.explanation}</p>
           <div className="flex items-center justify-between gap-3">
@@ -129,7 +140,7 @@ export function QuestionCard({ q, onAnswered, onNext, nextLabel = 'Next', showCo
               href={`/learn/${q.fallacy_slug}`}
               className="btn-ghost text-primary hover:!text-primary"
             >
-              Read more about {q.fallacy_name} →
+              {showFallacyBadge ? `Read more about ${q.fallacy_name} →` : 'Open in library →'}
             </Link>
             <button onClick={onNext} className="btn-primary">
               {nextLabel}

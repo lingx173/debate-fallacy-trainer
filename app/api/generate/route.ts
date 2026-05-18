@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { clientErrorMessage } from '@/lib/errors';
 import { getOpenAI, OPENAI_MODEL } from '@/lib/openai';
 import { FALLACY_BY_ID, buildOptions, pickRandomFallacies } from '@/lib/fallacies';
 
@@ -119,7 +120,7 @@ Return JSON in EXACTLY this schema:
   } catch (e: any) {
     console.error('Generate error:', e);
     return NextResponse.json(
-      { error: e.message || 'Generation failed' },
+      { error: clientErrorMessage(e) || 'Generation failed' },
       { status: 500 },
     );
   }

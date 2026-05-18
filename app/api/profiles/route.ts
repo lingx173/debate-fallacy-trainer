@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { clientErrorMessage } from '@/lib/errors';
 import { getSupabase } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
@@ -12,8 +13,8 @@ export async function GET() {
       .order('created_at', { ascending: true });
     if (error) throw error;
     return NextResponse.json(data ?? []);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: clientErrorMessage(e) }, { status: 500 });
   }
 }
 
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
       .single();
     if (error) throw error;
     return NextResponse.json(data);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: clientErrorMessage(e) }, { status: 500 });
   }
 }

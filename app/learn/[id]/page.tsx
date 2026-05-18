@@ -85,13 +85,13 @@ export default function FallacyDetailPage() {
 
       <div className="mt-10 p-6 border border-primary/30 rounded-lg bg-primary-highlight/30 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="flex-1">
-          <h3 className="font-display text-lg mb-1">Ready to practice?</h3>
+          <h3 className="font-display text-lg mb-1">See it in a crossfire</h3>
           <p className="text-text-muted text-sm">
             Generate examples of <b>{f.name}</b> on any topic you choose.
           </p>
         </div>
-        <Link href={`/practice?fallacy=${f.id}`} className="btn-primary">
-          Practice this fallacy
+        <Link href={`/demo?fallacy=${f.id}`} className="btn-primary">
+          Try a demo
         </Link>
       </div>
     </article>

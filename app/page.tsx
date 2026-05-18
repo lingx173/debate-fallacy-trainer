@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useProfile, Profile } from '@/components/ProfileContext';
-import { BookOpen, Dumbbell, ClipboardCheck, BarChart3, ChevronRight, Plus } from 'lucide-react';
+import { BookOpen, Dumbbell, ClipboardCheck, BarChart3, ChevronRight, Plus, Presentation } from 'lucide-react';
 
 const AVATAR_CHOICES = ['🎓', '⚖️', '📚', '🦉', '🦊', '🐢', '🦁', '🐱', '🦄', '🌟'];
 
@@ -159,11 +159,17 @@ function SignedInHome() {
 
       <div className="grid md:grid-cols-2 gap-4">
         <Tile
+          href="/demo"
+          icon={<Presentation size={22} />}
+          title="Demo"
+          body="Choose a fallacy and topic. See AI-generated crossfire examples with explanations."
+          accent
+        />
+        <Tile
           href="/practice"
           icon={<Dumbbell size={22} />}
           title="Practice"
-          body="Pick a fallacy and a topic. Generate examples until you can spot it cold."
-          accent
+          body="Random fallacy each round. One multiple-choice question at a time — identify the type."
         />
         <Tile
           href="/test"

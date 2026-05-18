@@ -7,6 +7,7 @@ import { User } from 'lucide-react';
 const links = [
   { href: '/', label: 'Home' },
   { href: '/learn', label: 'Learn' },
+  { href: '/demo', label: 'Demo' },
   { href: '/practice', label: 'Practice' },
   { href: '/test', label: 'Test' },
   { href: '/history', label: 'History' },

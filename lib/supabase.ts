@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { assertValidSupabaseUrl } from '@/lib/errors';
 
 let _client: SupabaseClient | null = null;
 
@@ -18,6 +19,7 @@ export function getSupabase(): SupabaseClient {
         'Set them in .env.local for dev or Vercel project settings for production.',
     );
   }
+  assertValidSupabaseUrl(url);
   _client = createClient(url, key, { auth: { persistSession: false } });
   return _client;
 }

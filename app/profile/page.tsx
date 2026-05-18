@@ -29,10 +29,11 @@ export default function ProfilePage() {
       <div className="card mb-4">
         <h2 className="font-display text-lg mb-2">Quick links</h2>
         <div className="grid grid-cols-2 gap-2">
+          <Link href="/demo" className="btn-secondary">Demo</Link>
           <Link href="/practice" className="btn-secondary">Practice</Link>
           <Link href="/test" className="btn-secondary">Test</Link>
           <Link href="/learn" className="btn-secondary">Learn</Link>
-          <Link href="/history" className="btn-secondary">History</Link>
+          <Link href="/history" className="btn-secondary col-span-2">History</Link>
         </div>
       </div>
 

@@ -1,21 +1,23 @@
 'use client';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useProfile } from '@/components/ProfileContext';
-import { QuestionCard, GeneratedQuestion } from '@/components/QuestionCard';
+import { DemoExampleCard, DemoExample } from '@/components/DemoExampleCard';
+import { FALLACIES, FALLACY_BY_ID } from '@/lib/fallacies';
 import { Sparkles, ArrowLeft, Loader2 } from 'lucide-react';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
-export default function PracticePage() {
+function DemoInner() {
   const { profile, loading } = useProfile();
+  const searchParams = useSearchParams();
+  const [fallacyId, setFallacyId] = useState(searchParams.get('fallacy') || '');
   const [topic, setTopic] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
-  const [current, setCurrent] = useState<GeneratedQuestion | null>(null);
+  const [current, setCurrent] = useState<DemoExample | null>(null);
   const [generating, setGenerating] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [seenFallacies, setSeenFallacies] = useState<string[]>([]);
-  const [questionKey, setQuestionKey] = useState(0);
 
   if (loading) {
     return <div className="container-narrow py-12 text-text-muted">Loading…</div>;
@@ -31,7 +33,8 @@ export default function PracticePage() {
     );
   }
 
-  async function loadQuestion() {
+  async function generate() {
+    if (!fallacyId) return;
     setErr(null);
     setGenerating(true);
     try {
@@ -39,17 +42,20 @@ export default function PracticePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mode: 'test',
+          mode: 'practice',
           topic: topic || undefined,
           difficulty,
-          excludeFallacies: seenFallacies,
+          targetFallacy: fallacyId,
         }),
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || 'Generation failed');
-      setCurrent(data as GeneratedQuestion);
-      setSeenFallacies((prev) => [...prev, data.fallacy_slug]);
-      setQuestionKey((k) => k + 1);
+      setCurrent({
+        fallacy_slug: data.fallacy_slug,
+        fallacy_name: data.fallacy_name,
+        argument_text: data.argument_text,
+        explanation: data.explanation,
+      });
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : 'Generation failed');
     } finally {
@@ -60,7 +66,6 @@ export default function PracticePage() {
   function backToSetup() {
     setCurrent(null);
     setErr(null);
-    setSeenFallacies([]);
   }
 
   if (!current && !generating) {
@@ -71,19 +76,39 @@ export default function PracticePage() {
         </Link>
 
         <header className="mb-8">
-          <span className="badge badge-primary mb-3">Practice</span>
+          <span className="badge badge-primary mb-3">Demo</span>
           <h1 className="font-display text-[clamp(1.75rem,1rem+2vw,2.75rem)] mb-2">
-            Spot the fallacy
+            See the fallacy in action
           </h1>
           <p className="text-text-muted">
-            Each question uses a random fallacy in a fresh crossfire snippet. Pick the type you
-            think is hiding in the argument — one question at a time, no scoreboard.
+            Choose a fallacy you&apos;re studying and optional debate context. We&apos;ll generate a
+            crossfire example for you to read — no quiz, just the snippet and an explanation when
+            you&apos;re ready.
           </p>
         </header>
 
         {err && <div className="alert alert-error mb-4">{err}</div>}
 
         <div className="card space-y-5">
+          <div>
+            <label className="block text-sm font-medium mb-2">Which fallacy?</label>
+            <select
+              className="select"
+              value={fallacyId}
+              onChange={(e) => setFallacyId(e.target.value)}
+            >
+              <option value="">— Pick a fallacy —</option>
+              {FALLACIES.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name} ({f.category})
+                </option>
+              ))}
+            </select>
+            {fallacyId && (
+              <p className="text-text-muted text-sm mt-2">{FALLACY_BY_ID[fallacyId].short_definition}</p>
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-2">
               Debate topic or context <span className="text-text-faint font-normal">(optional)</span>
@@ -95,9 +120,6 @@ export default function PracticePage() {
               onChange={(e) => setTopic(e.target.value)}
               maxLength={500}
             />
-            <p className="text-text-faint text-xs mt-1">
-              Leave blank to let the AI pick a topic appropriate for your level.
-            </p>
           </div>
 
           <div>
@@ -120,9 +142,14 @@ export default function PracticePage() {
             </div>
           </div>
 
-          <button type="button" onClick={() => loadQuestion()} className="btn-primary w-full">
+          <button
+            type="button"
+            onClick={() => generate()}
+            disabled={!fallacyId}
+            className="btn-primary w-full"
+          >
             <Sparkles size={16} />
-            New question
+            Generate example
           </button>
         </div>
       </div>
@@ -141,25 +168,28 @@ export default function PracticePage() {
       {generating && (
         <div className="card flex items-center gap-3 text-text-muted">
           <Loader2 size={18} className="animate-spin text-primary" />
-          Generating a crossfire question…
+          Generating a fresh crossfire example…
         </div>
       )}
 
       {current && !generating && (
-        <QuestionCard
-          key={questionKey}
-          q={current}
-          showFallacyBadge={false}
-          prompt="Crossfire snippet — which fallacy is this?"
-          onAnswered={() => {}}
-          onNext={() => {
-            void loadQuestion();
-          }}
-          nextLabel="Next question"
+        <DemoExampleCard
+          example={current}
+          onAnother={() => generate()}
+          anotherLabel="Another example"
+          busy={generating}
         />
       )}
 
       {err && <div className="alert alert-error mt-4">{err}</div>}
     </div>
+  );
+}
+
+export default function DemoPage() {
+  return (
+    <Suspense fallback={<div className="container-narrow py-12 text-text-muted">Loading…</div>}>
+      <DemoInner />
+    </Suspense>
   );
 }

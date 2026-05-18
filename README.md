@@ -97,9 +97,13 @@ Open <http://localhost:3000>.
 2. At <https://vercel.com/new>, import the GitHub repo.
 3. Under **Environment Variables**, add:
    - `OPENAI_API_KEY`
-   - `SUPABASE_URL`
+   - `SUPABASE_URL` — must be the **Project URL** from Supabase → Settings → API (`https://YOUR-REF.supabase.co`). **Do not** paste the `supabase.com/dashboard/...` link from your browser; that breaks the profile picker with a wall of HTML.
    - `SUPABASE_ANON_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`)
+   
+   For the bundled `fallacy-forum` project, the Project URL is:
+   `https://xmxmgyvjhbekrcezfpup.supabase.co`
 4. Click **Deploy**. Vercel auto-detects Next.js — no other config needed.
+5. After changing env vars, **redeploy** (Deployments → ⋯ → Redeploy) so production picks them up.
 
 ### Option B — via the CLI
 
